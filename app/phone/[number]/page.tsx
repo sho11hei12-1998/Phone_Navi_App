@@ -92,10 +92,16 @@ export default async function PhoneDetailPage({ params }: PageProps) {
         {/* Phone Info Card */}
         <div className="bg-white border border-gray-300 rounded-lg overflow-hidden mb-6">
           {/* Header */}
-          <div className="bg-green-600 px-4 py-3">
+          <div className="bg-green-600 px-4 py-3 flex items-center justify-between">
             <h3 className="text-sm font-bold text-white">
               {phone.formattedNumber}の基本情報
             </h3>
+            <a
+              href="#review-form"
+              className="bg-white text-green-600 rounded px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
+            >
+              口コミを投稿する
+            </a>
           </div>
 
           <table className="w-full">
@@ -214,9 +220,17 @@ export default async function PhoneDetailPage({ params }: PageProps) {
 
         {/* Reviews List */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-foreground mb-4">
-            口コミ一覧 ({reviews.length}件)
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-foreground">
+              口コミ一覧 ({reviews.length}件)
+            </h2>
+            <a
+              href="#review-form"
+              className="bg-white border-2 border-green-600 text-green-600 rounded-lg px-4 py-3 text-sm font-medium hover:bg-green-50 transition-colors whitespace-nowrap"
+            >
+              口コミを投稿する
+            </a>
+          </div>
           {reviews.length > 0 ? (
             <div className="space-y-4">
               {reviews.map((review) => (

@@ -105,16 +105,6 @@ export default function Header() {
                 </svg>
               </button>
             </form>
-            
-            {/* 口コミを投稿するボタン（詳細ページのみ表示） */}
-            {isDetailPage && (
-              <button
-                onClick={handleScrollToReviewForm}
-                className="bg-white border-2 border-green-600 text-green-600 rounded-lg px-4 py-3 text-sm font-medium hover:bg-green-50 transition-colors flex-shrink-0 whitespace-nowrap w-full sm:w-auto lg:ml-auto lg:mr-40"
-              >
-                口コミを投稿する
-              </button>
-            )}
           </div>
         </div>
       </div>
