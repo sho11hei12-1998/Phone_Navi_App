@@ -1,16 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createSupabaseClient } from "@/app/lib/supabaseClient";
+import { createReview } from "@/app/lib/supabase";
 
 interface ReviewFormProps {
   phoneNumber: string;
 }
 
 export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
+  const router = useRouter();
   const [callerSource, setCallerSource] = useState("");
   const [callPurpose, setCallPurpose] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const formatPhoneNumber = (num: string) => {
     const cleaned = num.replace(/[-\s]/g, "");
@@ -24,14 +30,63 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
   const maxCommentLength = 1000;
   const remainingChars = maxCommentLength - comment.length;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (rating === 0) {
-      alert("電話相手の総合評価を選択してください");
+      setError("電話相手の総合評価を選択してください");
       return;
     }
-    // TODO: API連携
-    alert("口コミの投稿機能は現在準備中です");
+
+    setIsSubmitting(true);
+
+    try {
+      // 電話番号からphone_number_idを取得
+      const supabase = createSupabaseClient();
+      const cleanNumber = phoneNumber.replace(/[-\s]/g, "");
+
+      const { data: phoneData, error: phoneError } = await supabase
+        .from("phone_numbers")
+        .select("id")
+        .eq("number", cleanNumber)
+        .single();
+
+      if (phoneError || !phoneData) {
+        // 電話番号が存在しない場合は新規作成（オプション）
+        // ここではエラーとして扱う
+        setError("電話番号が見つかりませんでした");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 口コミを作成
+      const result = await createReview({
+        phone_number_id: phoneData.id,
+        call_source: callerSource.trim() || null,
+        call_purpose: callPurpose.trim() || null,
+        body: comment.trim() || null,
+        rating: rating,
+      });
+
+      if (result.success) {
+        // 投稿成功後、ページをリロードして最新データを表示
+        router.refresh();
+        // フォームをリセット
+        setCallerSource("");
+        setCallPurpose("");
+        setComment("");
+        setRating(0);
+        // 成功メッセージ（オプション）
+        alert("口コミを投稿しました。");
+      } else {
+        setError(result.error || "口コミの投稿に失敗しました");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "口コミの投稿に失敗しました");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -137,14 +192,31 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="px-4 py-3 bg-red-50 border-t border-red-200">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
       {/* Submit Button */}
-      <div className="px-4 py-4 bg-gray-50 flex justify-center">
-        <button
-          type="submit"
-          className="w-auto px-8 bg-gray-300 text-gray-700 font-medium py-2 rounded hover:bg-gray-400 transition-colors"
-        >
-          投稿する
-        </button>
+      <div className="px-4 py-4 bg-gray-50">
+        <div className="flex">
+          <div className="w-[200px]"></div>
+          <div className="flex-1">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`px-8 py-2 rounded font-medium transition-colors ${
+                isSubmitting
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
+            >
+              {isSubmitting ? "投稿中..." : "投稿する"}
+            </button>
+          </div>
+        </div>
       </div>
     </form>
   );

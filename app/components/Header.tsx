@@ -9,8 +9,8 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   
-  // 詳細ページかどうかを判定（/phone/で始まるパス）
-  const isDetailPage = pathname?.startsWith("/phone/");
+  // 詳細ページかどうかを判定（/detail/で始まるパス）
+  const isDetailPage = pathname?.startsWith("/detail/");
   
   const handleScrollToReviewForm = () => {
     const reviewForm = document.getElementById("review-form");
@@ -21,9 +21,10 @@ export default function Header() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanNumber = query.replace(/[-\s]/g, "");
-    if (cleanNumber) {
-      router.push(`/phone/${cleanNumber}`);
+    const searchKeyword = query.trim();
+    if (searchKeyword) {
+      // 検索結果ページに遷移
+      router.push(`/search_detail?q=${encodeURIComponent(searchKeyword)}`);
     }
   };
 
@@ -79,7 +80,7 @@ export default function Header() {
             {/* Search Bar */}
             <form onSubmit={handleSubmit} className="flex items-center gap-2 flex-1 lg:flex-shrink-0 lg:w-[600px]">
               <input
-                type="tel"
+                type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="電話番号、事業者名、住所などのキーワードから検索"

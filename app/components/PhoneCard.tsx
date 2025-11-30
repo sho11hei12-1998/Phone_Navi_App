@@ -8,7 +8,7 @@ interface PhoneCardProps {
 export default function PhoneCard({ phone }: PhoneCardProps) {
   return (
     <Link
-      href={`/phone/${phone.number}`}
+      href={`/detail/${phone.number.replace(/[-\s]/g, "")}`}
       className="block bg-card border border-border rounded-lg p-4 hover:shadow-md hover:border-primary/30 transition-all"
     >
       <div className="flex items-start justify-between gap-3">

@@ -1,20 +1,8 @@
 import Link from "next/link";
+import { getWeeklyReviewRanking } from "@/app/lib/supabase";
 
-interface RankingItem {
-  rank: number;
-  name: string;
-  count: number;
-  phoneNumber?: string;
-}
-
-const weeklyReviewRanking: RankingItem[] = [
-  { rank: 1, name: "ニセ電力会社の自動音声アンケート", count: 252, phoneNumber: "08012345678" },
-  { rank: 2, name: "ニセ電力会社の自動音声アンケート", count: 222, phoneNumber: "08023456789" },
-  { rank: 3, name: "九州電力会社", count: 138, phoneNumber: "0921234567" },
-  { rank: 4, name: "", count: 137, phoneNumber: "0312345678" },
-];
-
-export default function ReviewRanking() {
+export default async function ReviewRanking() {
+  const weeklyReviewRanking = await getWeeklyReviewRanking(10);
   const getCrownIcon = (rank: number) => {
     if (rank === 1) {
       return (
@@ -45,7 +33,7 @@ export default function ReviewRanking() {
       {/* Header */}
       <div className="bg-yellow-50 border-b border-gray-200">
         <div className="px-4 py-2">
-          <h2 className="text-sm font-bold text-gray-900">週間口コミ獲得数ランキング</h2>
+          <h2 className="text-sm font-bold text-gray-900">直近7日間の人気口コミ獲得数ランキング</h2>
         </div>
       </div>
 
@@ -67,7 +55,7 @@ export default function ReviewRanking() {
                 {item.name ? (
                   item.phoneNumber ? (
                     <Link
-                      href={`/phone/${item.phoneNumber}`}
+                      href={`/detail/${item.phoneNumber.replace(/[-\s]/g, "")}`}
                       className="text-sm text-gray-900 hover:text-blue-600 hover:underline truncate block"
                     >
                       {item.name}
