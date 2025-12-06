@@ -5,10 +5,23 @@ import AccessRanking from "../components/AccessRanking";
 import ReviewRanking from "../components/ReviewRanking";
 import Link from "next/link";
 import PhoneCard from "../components/PhoneCard";
-import { getLatestKeywords } from "../lib/supabase";
+import { getLatestKeywords, searchPhones } from "../lib/supabase";
 
 export default async function MainPage() {
-  const latestKeywords = await getLatestKeywords(20);
+  const allLatestKeywords = await getLatestKeywords(30); // 多めに取得してフィルタリング
+  
+  // 検索結果が1つ以上あるキーワードのみをフィルタリング
+  const keywordResults = await Promise.all(
+    allLatestKeywords.map(async (keyword) => {
+      const results = await searchPhones(keyword);
+      return { keyword, hasResults: results.length > 0 };
+    })
+  );
+  
+  const latestKeywords = keywordResults
+    .filter(item => item.hasResults)
+    .map(item => item.keyword)
+    .slice(0, 20); // 最大20件まで
 
   return (
     <div className="min-h-screen bg-background">

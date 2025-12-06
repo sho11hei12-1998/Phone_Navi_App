@@ -32,9 +32,9 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="bg-card border border-border rounded-lg p-8 text-center">
-            <p className="text-secondary">検索キーワードを入力してください。</p>
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
+            <p className="text-gray-600">検索キーワードを入力してください。</p>
           </div>
         </div>
       </div>
@@ -74,15 +74,17 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         {/* 検索結果ヘッダー */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            「{searchKeyword}」の検索結果
-          </h1>
-          <p className="text-secondary">
-            {results.length}件の結果が見つかりました
-          </p>
+        <div className="mb-4">
+          <div className="bg-white border border-gray-300 rounded-lg px-4 py-3">
+            <h1 className="text-xl font-bold text-gray-900 mb-1">
+              「{searchKeyword}」の検索結果
+            </h1>
+            <p className="text-sm text-gray-600">
+              {results.length}件の結果が見つかりました
+            </p>
+          </div>
         </div>
 
         {/* 検索結果リスト */}
@@ -97,8 +99,8 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
                   key={phone.id}
                   className="bg-white border border-gray-300 rounded-lg overflow-hidden"
                 >
-                  {/* ヘッダー（オレンジ色のバナー） */}
-                  <div className="bg-orange-100 px-4 py-3 border-b border-gray-200">
+                  {/* ヘッダー（薄い緑色のバナー） */}
+                  <div className="bg-green-50 px-4 py-3 border-b border-gray-200">
                     <div className="flex items-center gap-2 flex-wrap">
                       <Link
                         href={`/detail/${phone.number.replace(/[-\s]/g, "")}?q=${encodeURIComponent(searchKeyword)}`}
@@ -163,7 +165,7 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
                         <span className="text-sm font-medium text-gray-900">
                           口コミ数
                         </span>
-                        <span className="text-sm text-orange-600 font-medium">
+                        <span className="text-sm text-green-600 font-medium">
                           {reviewCount}件
                         </span>
                       </div>
@@ -184,7 +186,7 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
             })}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-lg p-8 text-center">
+          <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +194,7 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-8 h-8 text-secondary"
+                className="w-8 h-8 text-gray-400"
               >
                 <path
                   strokeLinecap="round"
@@ -201,13 +203,13 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
                 />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-foreground mb-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
               検索結果が見つかりませんでした
             </h2>
-            <p className="text-secondary mb-6">
+            <p className="text-gray-600 mb-6">
               「{searchKeyword}」に一致する情報は見つかりませんでした。
             </p>
-            <p className="text-sm text-secondary">
+            <p className="text-sm text-gray-500">
               別のキーワードで検索してみてください。
             </p>
           </div>
@@ -215,7 +217,7 @@ export default async function SearchDetailPage({ searchParams }: PageProps) {
       </div>
 
       {/* Footer */}
-      <footer className="bg-foreground text-white py-8 mt-12">
+      <footer className="bg-foreground text-white py-8">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <p className="text-sm text-gray-400">
             &copy; 2025 電話番号ナビ. All rights reserved.

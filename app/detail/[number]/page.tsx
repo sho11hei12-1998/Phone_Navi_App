@@ -51,20 +51,20 @@ export default async function PhoneDetailPage({ params, searchParams }: PageProp
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="bg-card border border-border rounded-lg p-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-secondary">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-gray-400">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {number}
             </h1>
-            <p className="text-secondary mb-6">
+            <p className="text-gray-600 mb-6">
               この電話番号の情報はまだ登録されていません。
             </p>
-            <p className="text-sm text-secondary">
+            <p className="text-sm text-gray-500">
               情報をお持ちの方は、下記フォームから口コミを投稿してください。
             </p>
           </div>
@@ -108,7 +108,7 @@ export default async function PhoneDetailPage({ params, searchParams }: PageProp
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         {/* Phone Info Card */}
         <div className="bg-white border border-gray-300 rounded-lg overflow-hidden mb-6">
           {/* Header */}
@@ -202,8 +202,8 @@ export default async function PhoneDetailPage({ params, searchParams }: PageProp
               ))}
             </div>
           ) : (
-            <div className="bg-card border border-border rounded-lg p-8 text-center">
-              <p className="text-secondary">
+            <div className="bg-white border border-gray-300 rounded-lg p-8 text-center">
+              <p className="text-gray-600">
                 まだ口コミがありません。<br />
                 最初の投稿者になりましょう。
               </p>
@@ -218,7 +218,7 @@ export default async function PhoneDetailPage({ params, searchParams }: PageProp
       </div>
 
       {/* Footer */}
-      <footer className="bg-foreground text-white py-8 mt-12">
+      <footer className="bg-foreground text-white py-8">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <p className="text-sm text-gray-400">
             &copy; 2025 電話番号ナビ. All rights reserved.

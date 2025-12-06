@@ -58,3 +58,12 @@ export interface BusinessRow {
   created_at: string;
   updated_at: string;
 }
+
+// review_reports テーブル
+export interface ReviewReportRow {
+  id: number;
+  review_id: number;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}

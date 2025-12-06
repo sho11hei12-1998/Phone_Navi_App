@@ -6,6 +6,8 @@ type ReviewWithPhoneNumber = {
   body: string | null;
   created_at: string;
   phoneNumber: string;
+  call_source: string | null;
+  call_purpose: string | null;
 };
 
 export default async function NewReview() {
@@ -14,7 +16,7 @@ export default async function NewReview() {
   // レビューを取得（リレーションを使って電話番号も一緒に取得を試みる）
   let { data, error } = await supabase
     .from("reviews")
-    .select("id, body, created_at, phone_number_id, phone_numbers(number)")
+    .select("id, body, created_at, phone_number_id, call_source, call_purpose, phone_numbers(number)")
     .eq("is_deleted", false)
     .order("created_at", { ascending: false })
     .limit(10);
@@ -26,7 +28,7 @@ export default async function NewReview() {
     // エラーが発生した場合、phone_number_idを使って直接電話番号を取得
     const { data: reviewsData, error: reviewsError } = await supabase
       .from("reviews")
-      .select("id, body, created_at, phone_number_id")
+      .select("id, body, created_at, phone_number_id, call_source, call_purpose")
       .eq("is_deleted", false)
       .order("created_at", { ascending: false })
       .limit(10);
@@ -52,6 +54,8 @@ export default async function NewReview() {
           body: review.body,
           created_at: review.created_at,
           phoneNumber: phoneNumberMap.get(review.phone_number_id) || "不明",
+          call_source: review.call_source,
+          call_purpose: review.call_purpose,
         }));
       }
     }
@@ -71,6 +75,8 @@ export default async function NewReview() {
         body: review.body,
         created_at: review.created_at,
         phoneNumber: phoneNumber,
+        call_source: review.call_source,
+        call_purpose: review.call_purpose,
       };
     });
   }
@@ -117,6 +123,26 @@ export default async function NewReview() {
 
           const phoneNumber = review.phoneNumber;
           const comment = review.body || "コメントなし";
+          
+          // call_sourceとcall_purposeを表示用にフォーマット
+          const formatCallInfo = (): string | null => {
+            const source = review.call_source || "";
+            const purpose = review.call_purpose || "";
+            
+            if (!source && !purpose) {
+              return null;
+            }
+            
+            if (source && purpose) {
+              return `${source}／${purpose}`;
+            } else if (source) {
+              return source;
+            } else {
+              return purpose;
+            }
+          };
+          
+          const callInfo = formatCallInfo();
 
           return (
             <div
@@ -138,6 +164,11 @@ export default async function NewReview() {
                       ({formattedDate})
                     </span>
                   </div>
+                  {callInfo && (
+                    <div className="mb-1">
+                      <span className="text-xs text-gray-900">{callInfo}</span>
+                    </div>
+                  )}
                   <p className="text-sm text-gray-900 leading-relaxed">
                     {comment}
                   </p>

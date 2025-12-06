@@ -27,6 +27,8 @@ export interface Review {
   callType: CallType;
   comment: string;
   callerName?: string;
+  callSource?: string;
+  callPurpose?: string;
   createdAt: string;
   helpful: number;
   notHelpful: number;

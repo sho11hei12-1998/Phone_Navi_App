@@ -30,7 +30,6 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
   const [nearestStation, setNearestStation] = useState(existingBusiness?.nearest_station || "");
   const [accessInfo, setAccessInfo] = useState(existingBusiness?.access_info || "");
   const [websiteUrl, setWebsiteUrl] = useState(existingBusiness?.website_url || "");
-  const [introduction, setIntroduction] = useState("");
   const [captchaCode, setCaptchaCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,63 +65,56 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
     try {
       const supabase = createSupabaseClient();
 
-      // 既存の事業者情報があるかチェック
-      const { data: existingData } = await supabase
+      // 既存の事業者情報があるかチェック（business_idが必要なため）
+      const { data: existingBusiness, error: businessError } = await supabase
         .from("businesses")
         .select("id")
         .eq("phone_number_id", phoneNumberId)
         .single();
 
-      if (existingData) {
-        // 更新
-        const { error: updateError } = await supabase
-          .from("businesses")
-          .update({
-            name: name.trim() || null,
-            industry: industry.trim() || null,
-            postal_code: postalCode.trim() || null,
-            address: address.trim() || null,
-            contact_tel: contactTel.trim() || null,
-            nearest_station: nearestStation.trim() || null,
-            access_info: accessInfo.trim() || null,
-            website_url: websiteUrl.trim() || null,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", existingData.id);
+      if (businessError || !existingBusiness) {
+        setError("事業者情報が見つかりませんでした。更新リクエストは既存の事業者情報がある場合のみ送信できます。");
+        setIsSubmitting(false);
+        return;
+      }
 
-        if (updateError) {
-          setError(updateError.message || "事業者情報の更新に失敗しました");
-          setIsSubmitting(false);
-          return;
-        }
-      } else {
-        // 新規作成
-        const { error: insertError } = await supabase
-          .from("businesses")
-          .insert({
-            phone_number_id: phoneNumberId,
-            name: name.trim() || null,
-            industry: industry.trim() || null,
-            postal_code: postalCode.trim() || null,
-            address: address.trim() || null,
-            contact_tel: contactTel.trim() || null,
-            nearest_station: nearestStation.trim() || null,
-            access_info: accessInfo.trim() || null,
-            website_url: websiteUrl.trim() || null,
-          });
+      // ユーザーIDを取得（任意、エラーが発生しても続行）
+      let requestedBy: string | null = null;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        requestedBy = user?.id || null;
+      } catch (authError) {
+        // 認証情報の取得に失敗しても続行（requested_byは任意）
+      }
 
-        if (insertError) {
-          setError(insertError.message || "事業者情報の登録に失敗しました");
-          setIsSubmitting(false);
-          return;
-        }
+      // 事業者情報更新リクエストをbusiness_update_requestsテーブルにインサート
+      const { error: insertError } = await supabase
+        .from("business_update_requests")
+        .insert({
+          business_id: existingBusiness.id,
+          name: name.trim() || null,
+          industry: industry.trim() || null,
+          postal_code: postalCode.trim() || null,
+          address: address.trim() || null,
+          contact_tel: contactTel.trim() || null,
+          nearest_station: nearestStation.trim() || null,
+          access_info: accessInfo.trim() || null,
+          website_url: websiteUrl.trim() || null,
+          requested_by: requestedBy,
+          status: "pending",
+        });
+
+      if (insertError) {
+        setError(insertError.message || "更新リクエストの送信に失敗しました");
+        setIsSubmitting(false);
+        return;
       }
 
       // 成功時はページをリロード
       router.refresh();
-      alert("事業者情報を登録しました。");
+      alert("事業者情報の更新リクエストを送信しました");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "事業者情報の登録に失敗しました");
+      setError(err instanceof Error ? err.message : "更新リクエストの送信に失敗しました");
     } finally {
       setIsSubmitting(false);
     }
@@ -133,7 +125,7 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
       {/* Header */}
       <div className="bg-green-600 px-4 py-3">
         <h3 className="text-sm font-bold text-white">
-          {formattedNumber}の事業者詳細情報登録
+          {formattedNumber}の事業者情報提供
         </h3>
       </div>
 
@@ -269,22 +261,6 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
                 required
               />
             </div>
-          </div>
-        </div>
-
-        {/* 事業紹介 */}
-        <div className="flex">
-          <div className="bg-green-50 px-4 py-4 w-[200px] flex items-start">
-            <label className="text-sm font-medium text-gray-900">事業紹介</label>
-          </div>
-          <div className="flex-1 px-4 py-4">
-            <textarea
-              value={introduction}
-              onChange={(e) => setIntroduction(e.target.value)}
-              rows={6}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-              placeholder="事業紹介を入力してください"
-            />
           </div>
         </div>
       </div>

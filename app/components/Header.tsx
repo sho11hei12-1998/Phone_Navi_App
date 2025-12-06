@@ -29,10 +29,10 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-border shadow-sm">
+    <header className="z-50 bg-white border-b border-border shadow-sm pt-5">
       <div className="max-w-7xl mx-auto px-4">
         {/* Navigation Links - Top Center */}
-        <div className="flex items-center justify-center gap-0 py-3">
+        {/* <div className="flex items-center justify-center gap-0 py-3">
           <Link href="/" className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900">
             ホーム
           </Link>
@@ -52,22 +52,13 @@ export default function Header() {
           <Link href="/" className="px-3 py-1 text-sm text-gray-700 hover:text-gray-900">
             IP電話
           </Link>
-        </div>
+        </div> */}
 
         {/* Main Search Section */}
         <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6 pb-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0 hover:opacity-80 transition-opacity">
             <div className="flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="#22c55e"
-                className="w-8 h-8"
-              >
-              </svg>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-green-600">PhoneNavi</span>
                 <div className="text-xs text-gray-600">電話番号検索</div>

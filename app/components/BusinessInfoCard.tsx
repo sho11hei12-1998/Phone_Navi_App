@@ -100,7 +100,7 @@ export default function BusinessInfoCard({ displayNumber, business, phoneNumberI
             </h3>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-gray-300 text-gray-700 rounded px-3 py-1.5 text-xs font-medium hover:bg-gray-400 transition-colors whitespace-nowrap"
+              className="bg-white text-green-600 rounded px-3 py-1.5 text-xs font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
             >
               事業者情報登録
             </button>
@@ -119,7 +119,7 @@ export default function BusinessInfoCard({ displayNumber, business, phoneNumberI
               >
                 こちら
               </button>
-              から登録してください。
+              から申請してください。
             </p>
           </div>
         </div>

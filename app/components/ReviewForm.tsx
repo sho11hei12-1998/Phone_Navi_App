@@ -14,15 +14,24 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
   const [callerSource, setCallerSource] = useState("");
   const [callPurpose, setCallPurpose] = useState("");
   const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const formatPhoneNumber = (num: string) => {
+    // 既にハイフンが含まれている場合はそのまま返す
+    if (num.includes("-")) {
+      return num;
+    }
+    
     const cleaned = num.replace(/[-\s]/g, "");
-    if (cleaned.length === 11 && cleaned.startsWith("0")) {
+    
+    // 10桁または11桁の電話番号をフォーマット
+    if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 2)}-${cleaned.slice(2, 6)}-${cleaned.slice(6)}`;
+    } else if (cleaned.length === 11) {
       return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
     }
+    
     return num;
   };
 
@@ -33,11 +42,6 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (rating === 0) {
-      setError("電話相手の総合評価を選択してください");
-      return;
-    }
 
     setIsSubmitting(true);
 
@@ -66,7 +70,7 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
         call_source: callerSource.trim() || null,
         call_purpose: callPurpose.trim() || null,
         body: comment.trim() || null,
-        rating: rating,
+        rating: null,
       });
 
       if (result.success) {
@@ -76,7 +80,6 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
         setCallerSource("");
         setCallPurpose("");
         setComment("");
-        setRating(0);
         // 成功メッセージ（オプション）
         alert("口コミを投稿しました。");
       } else {
@@ -155,41 +158,6 @@ export default function ReviewForm({ phoneNumber }: ReviewFormProps) {
           </div>
         </div>
 
-        {/* 電話相手の総合評価 Section */}
-        <div className="flex">
-          <div className="bg-green-50 px-4 py-4 w-[200px] flex items-start">
-            <label className="text-sm font-medium text-gray-900">
-              電話相手の総合評価 <span className="text-red-600">(必須)</span>
-            </label>
-          </div>
-          <div className="flex-1 px-4 py-4 flex items-center">
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => setRating(star)}
-                  className="focus:outline-none"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill={star <= rating ? "#FFD700" : "none"}
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke={star <= rating ? "#FFD700" : "#D1D5DB"}
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"
-                    />
-                  </svg>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Error Message */}

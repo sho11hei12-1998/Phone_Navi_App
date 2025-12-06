@@ -1,9 +1,22 @@
 import Link from "next/link";
-import { getPopularKeywords } from "@/app/lib/supabase";
+import { getPopularKeywords, searchPhones } from "@/app/lib/supabase";
 
 export default async function Keyword() {
+  // 多めに取得してフィルタリング
+  const allPopularKeywords = await getPopularKeywords(30);
+  
+  // 検索結果が1つ以上あるキーワードのみをフィルタリング
+  const keywordResults = await Promise.all(
+    allPopularKeywords.map(async (item) => {
+      const results = await searchPhones(item.keyword);
+      return { ...item, hasResults: results.length > 0 };
+    })
+  );
+  
   // 2行分のキーワードを表示（約12-16個程度）
-  const popularKeywords = await getPopularKeywords(16);
+  const popularKeywords = keywordResults
+    .filter(item => item.hasResults)
+    .slice(0, 16);
 
   return (
     <section className="bg-white border border-gray-300 rounded-lg mb-4">

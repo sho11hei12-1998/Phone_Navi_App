@@ -56,6 +56,8 @@ function convertReviewRowToReview(row: ReviewRow & { phone_numbers?: PhoneNumber
     callType: callType,
     comment: row.body || "",
     callerName: row.call_source || undefined,
+    callSource: row.call_source || undefined,
+    callPurpose: row.call_purpose || undefined,
     createdAt: row.created_at,
     helpful: 0, // MVPでは未実装
     notHelpful: 0, // MVPでは未実装
@@ -572,7 +574,7 @@ export async function createReview(data: {
   call_source: string | null;
   call_purpose: string | null;
   body: string | null;
-  rating: number;
+  rating: number | null;
 }): Promise<{ success: boolean; error?: string }> {
   const supabase = createSupabaseClient();
 
@@ -644,5 +646,27 @@ export async function createReview(data: {
     return { success: true };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : "口コミの作成に失敗しました" };
+  }
+}
+
+// 口コミ通報を作成
+export async function createReviewReport(reviewId: number): Promise<{ success: boolean; error?: string }> {
+  const supabase = createSupabaseClient();
+
+  try {
+    const { error: reportError } = await supabase
+      .from("review_reports")
+      .insert({
+        review_id: reviewId,
+        status: "pending",
+      });
+
+    if (reportError) {
+      return { success: false, error: reportError.message || "通報の作成に失敗しました" };
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : "通報の作成に失敗しました" };
   }
 }
