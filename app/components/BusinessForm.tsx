@@ -65,7 +65,7 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
     try {
       const supabase = createSupabaseClient();
 
-      // 既存の事業者情報があるかチェック（business_idが必要なため）
+      // 既存の事業者情報があるかチェック
       const { data: existingBusiness, error: businessError } = await supabase
         .from("businesses")
         .select("id")
@@ -73,25 +73,15 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
         .single();
 
       if (businessError || !existingBusiness) {
-        setError("事業者情報が見つかりませんでした。更新リクエストは既存の事業者情報がある場合のみ送信できます。");
+        setError("事業者情報が見つかりませんでした。更新は既存の事業者情報がある場合のみ可能です。");
         setIsSubmitting(false);
         return;
       }
 
-      // ユーザーIDを取得（任意、エラーが発生しても続行）
-      let requestedBy: string | null = null;
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        requestedBy = user?.id || null;
-      } catch (authError) {
-        // 認証情報の取得に失敗しても続行（requested_byは任意）
-      }
-
-      // 事業者情報更新リクエストをbusiness_update_requestsテーブルにインサート
-      const { error: insertError } = await supabase
-        .from("business_update_requests")
-        .insert({
-          business_id: existingBusiness.id,
+      // 事業者情報をbusinessesテーブルに直接更新
+      const { error: updateError } = await supabase
+        .from("businesses")
+        .update({
           name: name.trim() || null,
           industry: industry.trim() || null,
           postal_code: postalCode.trim() || null,
@@ -100,19 +90,18 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
           nearest_station: nearestStation.trim() || null,
           access_info: accessInfo.trim() || null,
           website_url: websiteUrl.trim() || null,
-          requested_by: requestedBy,
-          status: "pending",
-        });
+        })
+        .eq("id", existingBusiness.id);
 
-      if (insertError) {
-        setError(insertError.message || "更新リクエストの送信に失敗しました");
+      if (updateError) {
+        setError(updateError.message || "事業者情報の更新に失敗しました");
         setIsSubmitting(false);
         return;
       }
 
       // 成功時はページをリロード
       router.refresh();
-      alert("事業者情報の更新リクエストを送信しました");
+      alert("事業者情報を更新しました");
     } catch (err) {
       setError(err instanceof Error ? err.message : "更新リクエストの送信に失敗しました");
     } finally {
@@ -125,7 +114,7 @@ export default function BusinessForm({ phoneNumberId, phoneNumber, displayNumber
       {/* Header */}
       <div className="bg-green-600 px-4 py-3">
         <h3 className="text-sm font-bold text-white">
-          {formattedNumber}の事業者情報提供
+          {formattedNumber}の事業者情報登録
         </h3>
       </div>
 
